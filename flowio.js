@@ -27,6 +27,7 @@ const getBasics = ()=>{
  * flowio lib contains the standard database/study/function diagrams
  * */
 const importLibraryFlowio=(loadLocalLibrary)=>{
+	console.log('hey')
 	// at the end of the file
 	loadLocalLibrary('flowio', flowio_lib)
 }

@@ -1,0 +1,27 @@
+{
+  "name": "flowio-core",
+  "version": "1.0.0",
+  "description": "This is the core of the flowio project",
+  "main": "flowio.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bernatesquirol/flowio-core.git"
+  },
+  "keywords": [
+    "flowio-core"
+  ],
+  "author": "Bernat Esquirol",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bernatesquirol/flowio-core/issues"
+  },
+  "homepage": "https://github.com/bernatesquirol/flowio-core#readme",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "pako": "^1.0.10",
+    "xml2js": "^0.4.19"
+  }
+}

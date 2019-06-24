@@ -66,7 +66,6 @@ class mxObject extends Object {
   changeGeometrySimpleBlock(key, value){
     //key: x, y, width, height
     if (this['_isSimpleBlock']) this.object.mxCell[0].mxGeometry[0].$[key]=value
-
   }
   changeStyle(new_style){
     if (this['_isSimpleBlock']) this.object.mxCell[0].$.style=new_style

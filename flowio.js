@@ -347,11 +347,13 @@ const getFileIndex=(original_path)=>{
  * @param {Int} y recursive use
  * @param {Int} padding_top Padding between functions
  */
+
 const extractLogicFromFunction=(index, file_id, extract_func=true, extract_studies=true, max_depth=null, already_explored={}, depth=0, root_id=ROOT_ID, x=0, y=0, padding_top=20)=>{
+	console.log('\n..Extraient', index[file_id], file_id, depth,'..\n')
 	let basics_lib = getBasics()
 	let promise_container = drawionode.getSimpleBlockFromLibrary(basics_lib, 'container')  
-	if (Object.keys(already_explored).includes(file_id)) return null
-	if (!index[file_id]) return null
+	if (Object.keys(already_explored).includes(file_id)) return Promise.resolve({x:x,y:y, already_explored:already_explored,width:0}) // el null es això
+	if (!index[file_id]) return Promise.resolve({x:x,y:y, already_explored:already_explored,width:0}) // el null es això
   return drawionode.readDiagram(index[file_id]).then((read_diagram_obj)=>{
     let diagram = read_diagram_obj['diagram']
 		let input_ids = {}
@@ -403,7 +405,7 @@ const extractLogicFromFunction=(index, file_id, extract_func=true, extract_studi
 		
 		//cascade of function promises		
 		let extract_logic_promises = []
-		if(max_depth==null || depth<max_depth){
+		if((max_depth==null || depth<max_depth) && (function_cells_small.length!=0||studies_small.length!=0)){
 			let cells_to_extract = []
 			if (extract_func)cells_to_extract=[...cells_to_extract, ...function_cells_small]
 			if (extract_studies) cells_to_extract=[...cells_to_extract,...studies_small]
@@ -411,17 +413,22 @@ const extractLogicFromFunction=(index, file_id, extract_func=true, extract_studi
 				if (acc.length==0){
 					return [extractLogicFromFunction(index,func.object.$.flowio_id, extract_func, extract_studies, max_depth, new_already_explored,	depth+1,ROOT_ID,x, y+height_total+padding_top)]
 				}
+				if (acc[acc.length-1]==null) return acc
 				return [...acc,(acc[acc.length-1].then((result)=>{
 					let x_func = result['x']
 					let y_func = result['y']
 					let width = result['width']
-					let new_new_already_explored = result['already_explored']
-
+					let new_new_already_explored = result['already_explored']				
 					let return_val =  extractLogicFromFunction(index,func.object.$.flowio_id, extract_func, extract_studies, max_depth, new_new_already_explored, depth+1,ROOT_ID,x_func+width, y_func)
 					return return_val
 				}))].filter((item)=>item!=null)
 			},[])
 		}
+
+		/*if (extract_logic_promises.length==0){
+			console.log('NO MÉS', file_id, function_cells_small.length==0&&studies_small.length==0)
+			return Promise.resolve({'title':title,'x':x,'y':y,'width':width_total, 'height':height_total,'blocks':all_blocks, 'already_explored':new_already_explored})
+		}*/
     return Promise.all([...extract_logic_promises,promise_container]).then((all_promises_results)=>{
       all_promises_results = all_promises_results.filter((item)=>item!=null)
       let container = all_promises_results[all_promises_results.length-1]
@@ -441,7 +448,7 @@ const extractLogicFromFunction=(index, file_id, extract_func=true, extract_studi
           new_edge.changeStyle(new_style)
           return new_edge
         })
-			let all_func_blocks = all_func.flatMap((item)=>item.blocks)
+			let all_func_blocks = all_func.flatMap((item)=>item.blocks).filter((item)=>item!=null)
 			let all_blocks_to_return = [...edges,container_modified,...all_func_blocks,...all_blocks,...children_of_all_blocks]
 				.sort((a,b)=>{
 					//edges per sobre
@@ -457,7 +464,7 @@ const extractLogicFromFunction=(index, file_id, extract_func=true, extract_studi
 const extractLogicFromFile=(index,path)=>{
 	let paths_x_id = _.invert(index)
 	if (!paths_x_id[path]) return
-  return extractLogicFromFunction(index, paths_x_id[path]).then((func_extraction)=>{
+  return extractLogicFromFunction(index, paths_x_id[path]).then((func_extraction)=>{//,true,true,1
 		let all_blocks = func_extraction['blocks']
 		let mxGraph = drawionode.getDiagram(all_blocks, ROOT_ID)
 		return {'data':drawionode.toString(mxGraph,{headless:true}),'name':func_extraction['title']+'-expanded.flowio'}

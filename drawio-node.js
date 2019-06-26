@@ -26,6 +26,9 @@ class mxObject extends Object {
       }
     }
   }
+  copyMxObject(){
+    return new mxObject(JSON.parse(JSON.stringify(this)))
+  }
   getType(){
     return this['_type']
   }
@@ -307,8 +310,8 @@ const getSimpleBlockFromLibrary = function(library, title){
  * @param  {String} flowio_id of the flowio_id
  * @return {Object} {object:{mxcell:[{mxgeometry:[{}]}}]} (all copied)
  */
-const modifySimpleBlock = (block, id=null, id_parent=null,new_title=null, x=null, y=null,width=null, height=null, flowio_id=null)=>{
-    //let block = JSON.parse(JSON.stringify(block_o))
+const modifySimpleBlock = (block_o, id=null, id_parent=null,new_title=null, x=null, y=null,width=null, height=null, flowio_id=null)=>{
+    let block = block_o.copyMxObject()
 
     if (new_title!=null) block.changeProp('label',new_title)
     if (width!=null) block.changeGeometrySimpleBlock('width',width) //block.object.mxCell[0].mxGeometry[0].$.width = width

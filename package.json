@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/bernatesquirol/flowio-core#readme",
   "dependencies": {
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.21",
     "pako": "^1.0.10",
     "xml2js": "^0.4.19"
   }
